@@ -13,7 +13,8 @@ export default async function handler(req, res) {
     });
   }
 
-  if (text === "/menu") {
+  // Menü
+  if (text.startsWith("/menu")) {
     return send(
       "Hauptmenü:\n" +
       "/metals – Metalle\n" +
@@ -22,7 +23,8 @@ export default async function handler(req, res) {
     );
   }
 
-  if (text === "/metals") {
+  // Metals
+  if (text.startsWith("/metals")) {
     const pairs = ["XAUUSD", "XAGUSD", "XAUAUD"];
     let msg = "Metals Menü:\n";
 
@@ -33,7 +35,8 @@ export default async function handler(req, res) {
     return send(msg);
   }
 
-  if (text === "/crypto") {
+  // Crypto
+  if (text.startsWith("/crypto")) {
     const pairs = ["BTCUSD", "ETHUSD", "XRPUSD"];
     let msg = "Crypto Menü:\n";
 
@@ -44,7 +47,8 @@ export default async function handler(req, res) {
     return send(msg);
   }
 
-  if (text === "/forex") {
+  // Forex
+  if (text.startsWith("/forex")) {
     const pairs = ["EURUSD", "GBPUSD", "USDJPY"];
     let msg = "Forex Menü:\n";
 
@@ -55,5 +59,6 @@ export default async function handler(req, res) {
     return send(msg);
   }
 
+  // Fallback
   return send("ISBOT aktiv. Nutze /menu.");
 }
