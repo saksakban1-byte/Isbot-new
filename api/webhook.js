@@ -23,23 +23,29 @@ export default async function handler(req, res) {
   }
 
   if (text === "/metals") {
-    const pairs = ["XAUUSD", "XAGUSD", "XAUAUD"];
-    const results = [];
+  const pairs = ["XAUUSD", "XAGUSD", "XAUAUD"];
+  const results = [];
 
-    for (const p of pairs) {
-      const price = await getPrice(p);
-      const score = await fakeScore(p);
-      results.push({ pair: p, price, score });
+  for (const p of pairs) {
+    let price;
+    try {
+      price = await getPrice(p);
+    } catch (e) {
+      price = "n/a";
     }
 
-    results.sort((a, b) => b.score - a.score);
-
-    let msg = "Metals Menü:\n";
-    results.forEach(r => msg += `${r.pair} — ${r.price} — Score ${r.score}\n`);
-    msg += `\nEmpfehlung: ${results[0].pair} (${results[0].score})`;
-
-    return send(msg);
+    const score = await fakeScore(p);
+    results.push({ pair: p, price, score });
   }
+
+  results.sort((a, b) => b.score - a.score);
+
+  let msg = "Metals Menü:\n";
+  results.forEach(r => msg += `${r.pair} — ${r.price} — Score ${r.score}\n`);
+  msg += `\nEmpfehlung: ${results[0].pair} (${results[0].score})`;
+
+  return send(msg);
+}
 
   if (text === "/crypto") {
     const pairs = ["BTCUSD", "ETHUSD", "XRPUSD"];
@@ -87,9 +93,13 @@ async function getPrice(symbol) {
   const base = symbol.slice(0, 3);
   const url = `https://api.exchangerate.host/latest?base=${base}&symbols=USD`;
   const data = await fetch(url).then(r => r.json());
+
+  if (!data || !data.rates || !data.rates.USD) {
+    return "n/a"; // verhindert Absturz
+  }
+
   return data.rates.USD;
 }
-
 async function fakeScore(symbol) {
   return Math.floor(Math.random() * 100);
 }
