@@ -3,13 +3,22 @@ export default async function handler(req, res) {
   if (!msg) return res.status(200).send("ok");
 
   const chatId = msg.chat.id;
-  const text = msg.text || "";
 
-  // Normalisierung: entfernt Bot-Suffix, Leerzeichen, Zero-Width, Groß/Klein
-  const clean = text
-    .split("@")[0]        // entfernt z.B. /metals@Tradisbot
-    .trim()               // entfernt Leerzeichen / unsichtbare Zeichen
-    .toLowerCase();       // macht alles klein
+  // Text aus message oder aus Entities extrahieren
+  let text = msg.text || "";
+  if (msg.entities && msg.entities[0]?.type === "bot_command") {
+    text = text.slice(msg.entities[0].offset, msg.entities[0].length);
+  }
+
+  // Entfernt ALLE unsichtbaren Unicode-Zeichen
+  const removeInvisible = s =>
+    s.replace(/[\u200B-\u200F\u202A-\u202E\u2060-\u206F]/g, "");
+
+  // Normalisierung
+  const clean = removeInvisible(text)
+    .split("@")[0]
+    .trim()
+    .toLowerCase();
 
   async function send(text) {
     await fetch(`https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendMessage`, {
@@ -19,46 +28,22 @@ export default async function handler(req, res) {
     });
   }
 
-  // Menü
+  // Commands
   if (clean === "/menu") {
-    return send(
-      "Hauptmenü:\n" +
-      "/metals – Metalle\n" +
-      "/crypto – Krypto\n" +
-      "/forex – Forex\n"
-    );
+    return send("Hauptmenü:\n/metals – Metalle\n/crypto – Krypto\n/forex – Forex");
   }
 
-  // Metals
   if (clean === "/metals") {
-    return send(
-      "Metals Menü:\n" +
-      "XAUUSD\n" +
-      "XAGUSD\n" +
-      "XAUAUD"
-    );
+    return send("Metals Menü:\nXAUUSD\nXAGUSD\nXAUAUD");
   }
 
-  // Crypto
   if (clean === "/crypto") {
-    return send(
-      "Crypto Menü:\n" +
-      "BTCUSD\n" +
-      "ETHUSD\n" +
-      "XRPUSD"
-    );
+    return send("Crypto Menü:\nBTCUSD\nETHUSD\nXRPUSD");
   }
 
-  // Forex
   if (clean === "/forex") {
-    return send(
-      "Forex Menü:\n" +
-      "EURUSD\n" +
-      "GBPUSD\n" +
-      "USDJPY"
-    );
+    return send("Forex Menü:\nEURUSD\nGBPUSD\nUSDJPY");
   }
 
-  // Fallback
   return send("ISBOT aktiv. Nutze /menu.");
 }
