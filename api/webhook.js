@@ -13,13 +13,13 @@ export default async function handler(req, res) {
   // Entfernt ALLE unsichtbaren Unicode-Zeichen, Steuerzeichen, Formatierungszeichen
   const normalize = s =>
     s
-      .normalize("NFKC") // Unicode Normalisierung
-      .replace(/[\u0000-\u001F\u007F-\u009F]/g, "") // Steuerzeichen
-      .replace(/[\u200B-\u200F]/g, "") // Zero-Width
-      .replace(/[\u202A-\u202E]/g, "") // RTL/LTR Formatierung
-      .replace(/[\u2060-\u206F]/g, "") // Word Joiner etc.
-      .replace(/\uFEFF/g, "") // BOM
-      .replace(/\s+/g, "") // alle Spaces (auch Zero-Width)
+      .normalize("NFKC")
+      .replace(/[\u0000-\u001F\u007F-\u009F]/g, "")
+      .replace(/[\u200B-\u200F]/g, "")
+      .replace(/[\u202A-\u202E]/g, "")
+      .replace(/[\u2060-\u206F]/g, "")
+      .replace(/\uFEFF/g, "")
+      .replace(/\s+/g, "")
       .trim()
       .toLowerCase();
 
@@ -35,4 +35,20 @@ export default async function handler(req, res) {
 
   // Commands
   if (clean === "/menu") {
-    return send("Hauptmenü:\n/metals – Met
+    return send("Hauptmenü:\n/metals – Metalle\n/crypto – Krypto\n/forex – Forex");
+  }
+
+  if (clean === "/metals") {
+    return send("Metals Menü:\nXAUUSD\nXAGUSD\nXAUAUD");
+  }
+
+  if (clean === "/crypto") {
+    return send("Crypto Menü:\nBTCUSD\nETHUSD\nXRPUSD");
+  }
+
+  if (clean === "/forex") {
+    return send("Forex Menü:\nEURUSD\nGBPUSD\nUSDJPY");
+  }
+
+  return send("ISBOT aktiv. Nutze /menu.");
+}
